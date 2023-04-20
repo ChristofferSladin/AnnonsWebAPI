@@ -1,6 +1,9 @@
-﻿using AnnonsWebAPI.Models;
+﻿using AnnonsWebAPI.Data;
+using AnnonsWebAPI.Models;
+using AnnonsWebAPI.Models.DTOs;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace AnnonsWebAPI.Controllers
 {
@@ -8,124 +11,106 @@ namespace AnnonsWebAPI.Controllers
     [ApiController]
     public class AdsController : ControllerBase
     {
-        private readonly ILogger<AdsController> _logger;
+        private readonly ApplicationDbContext _dbContext;
 
-        public AdsController(ILogger<AdsController> logger)
+        public AdsController(ApplicationDbContext dbcontext)
         {
-            _logger = logger;
+            _dbContext = dbcontext;
         }
-
-        private static List<Ad> AdList = new List<Ad>
-        {
-            new Ad
-            {
-                Id = 1,
-            Title = "Buy One, Get One Free!",
-            Description = "Shop now and get a free item with your purchase!",
-            TargetUrl = "https://example.com/shop",
-            StartDate = new DateTime(2023, 5, 1)
-            },
-
-            new Ad
-            {
-                Id = 2,
-            Title = "Buy One, Get Two Free!",
-            Description = "Shop now and get a free item with your purchase!",
-            TargetUrl = "https://example.com/shop",
-            StartDate = new DateTime(2023, 5, 1)
-            },
-
-            new Ad
-            {
-                Id = 3,
-            Title = "Buy One, Get One Three Free!",
-            Description = "Shop now and get a free item with your purchase!",
-            TargetUrl = "https://example.com/shop",
-            StartDate = new DateTime(2023, 5, 1)
-            },
-
-            new Ad
-            {
-                Id = 4,
-            Title = "Buy One, Get One Free!",
-            Description = "Shop now and get a free item with your purchase!",
-            TargetUrl = "https://example.com/shop",
-            StartDate = new DateTime(2023, 5, 1)
-            },
-
-            new Ad
-            {
-                Id = 5,
-            Title = "Buy One, Get Two!",
-            Description = "Shop now and get a free item with your purchase!",
-            TargetUrl = "https://example.com/shop",
-            StartDate = new DateTime(2023, 5, 1)
-            },
-
-        };
 
         [HttpGet]
-        public async Task<ActionResult<List<Ad>>> GetAll()
+        public async Task<ActionResult<List<AdDTO>>> GetAll()
         {
-            return Ok(AdList);
+            var ads = await _dbContext.Ads.ToListAsync();
+            var adDTOs = ads.Select(ad => new AdDTO
+            {
+                Id = ad.Id,
+                Title = ad.Title,
+                Description = ad.Description,
+                TargetUrl = ad.TargetUrl,
+                StartDate = DateTime.Now
+            }).ToList();
+
+            return Ok(adDTOs);
         }
-        
+
 
         [HttpGet]
         [Route("{id}")]
-        public async Task<ActionResult<Ad>> GetOne(int id)
+        public async Task<ActionResult<AdDTO>> GetOne(int id)
         {
-            var ad = AdList.Find(s => s.Id == id);
-
+            var ad = _dbContext.Ads.Find(id);
+            
             if (ad == null)
             {
                 return BadRequest("Ad not found");
             }
-            return Ok(ad);
+
+            var adDTO = new AdDTO
+            {
+                Id = ad.Id,
+                Title = ad.Title,
+                Description = ad.Description,
+                TargetUrl= ad.TargetUrl,
+                StartDate = DateTime.Now
+            };
+
+            return Ok(adDTO);
         }
 
         [HttpPost]
-        public async Task<ActionResult<Ad>> PostHero(Ad ad)
+        public async Task<ActionResult<AdDTO>> PostAd(UpdateAdDTO adDTO)
         {
-            AdList.Add(ad);
-            return Ok(AdList);
+            var ad = new Ad
+            {
+                Title = adDTO.Title,
+                Description = adDTO.Description,
+                TargetUrl = adDTO.TargetUrl,
+                StartDate = DateTime.Now,
+            };
+
+            _dbContext.Ads.Add(ad);
+            await _dbContext.SaveChangesAsync();
+
+            return Ok(adDTO);
         }
 
         [HttpPut]
-        public async Task<ActionResult<Ad>> UpdateHero(Ad ad)
+        [Route("{id}")]
+        public async Task<ActionResult<AdDTO>> UpdateAd(UpdateAdDTO updateAdDTO, int id)
         {
-            // OBS: PUT Uppdaterar HELA SuperHero (ALLA properties)
-            var adToUpdate = AdList.Find(s => s.Id == ad.Id);
+            var adToUpdate = _dbContext.Ads.Find(id);
 
             if (adToUpdate == null)
             {
                 return BadRequest("Ad not found");
             }
 
-            adToUpdate.Title = ad.Title;
-            adToUpdate.Description = ad.Description;
-            adToUpdate.TargetUrl = ad.TargetUrl;
-            adToUpdate.StartDate = ad.StartDate;
+            adToUpdate.Title = updateAdDTO.Title;
+            adToUpdate.Description = updateAdDTO.Description;
+            adToUpdate.TargetUrl = updateAdDTO.TargetUrl;
+            adToUpdate.StartDate = updateAdDTO.StartDate;
 
-            return Ok(AdList);
+            await _dbContext.SaveChangesAsync();
+
+            return Ok(updateAdDTO);
         }
 
         [HttpDelete]
         [Route("{id}")]
         public async Task<ActionResult<Ad>> Delete(int id)
         {
-            var hero = AdList.Find(s => s.Id == id);
+            var ad = _dbContext.Ads.Find(id);
 
-            if (hero == null)
+            if (ad == null)
             {
                 return BadRequest("Ad not found");
             }
 
-            AdList.Remove(hero);
-            return Ok(AdList);
+            _dbContext.Ads.Remove(ad);
+            await _dbContext.SaveChangesAsync();
+
+            return Ok("Ad Deleted Successfully");
         }
-
-
-
     }
 }
