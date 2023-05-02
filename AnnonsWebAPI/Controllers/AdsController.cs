@@ -1,12 +1,17 @@
 ﻿using AnnonsWebAPI.Data;
 using AnnonsWebAPI.Models;
 using AnnonsWebAPI.Models.DTOs;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Data;
 
 namespace AnnonsWebAPI.Controllers
 {
+    [EnableCors("AllowAll")]
+
     [Route("api/[controller]")]
     [ApiController]
     public class AdsController : ControllerBase
@@ -18,7 +23,22 @@ namespace AnnonsWebAPI.Controllers
             _dbContext = dbcontext;
         }
 
+        // READ ALL ///////////////////////////////////////////////////////
+        /// <summary>
+        /// Retrieve ALL Ads from the database
+        /// </summary>
+        /// <returns>
+        /// A full list of ALL Ads
+        /// </returns>
+        /// <remarks>
+        /// Example end point: GET /api/Ads
+        /// </remarks>
+        /// <response code="200">
+        /// Successfully returned a full list of ALL Ads
+        /// </response>
+
         [HttpGet]
+        [Authorize(Roles = "Admin, User")]
         public async Task<ActionResult<List<AdDTO>>> GetAll()
         {
             var ads = await _dbContext.Ads.ToListAsync();
@@ -37,6 +57,7 @@ namespace AnnonsWebAPI.Controllers
 
         [HttpGet]
         [Route("{id}")]
+        [Authorize(Roles = "Admin, User")]
         public async Task<ActionResult<AdDTO>> GetOne(int id)
         {
             var ad = _dbContext.Ads.Find(id);
@@ -59,6 +80,7 @@ namespace AnnonsWebAPI.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<AdDTO>> PostAd(UpdateAdDTO adDTO)
         {
             var ad = new Ad
@@ -77,6 +99,7 @@ namespace AnnonsWebAPI.Controllers
 
         [HttpPut]
         [Route("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<AdDTO>> UpdateAd(UpdateAdDTO updateAdDTO, int id)
         {
             var adToUpdate = _dbContext.Ads.Find(id);
@@ -98,6 +121,7 @@ namespace AnnonsWebAPI.Controllers
 
         [HttpDelete]
         [Route("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Ad>> Delete(int id)
         {
             var ad = _dbContext.Ads.Find(id);
