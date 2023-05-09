@@ -4,6 +4,7 @@ using AnnonsWebAPI.Models.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
@@ -61,7 +62,7 @@ namespace AnnonsWebAPI.Controllers
         public async Task<ActionResult<AdDTO>> GetOne(int id)
         {
             var ad = _dbContext.Ads.Find(id);
-            
+
             if (ad == null)
             {
                 return BadRequest("Ad not found");
@@ -72,7 +73,7 @@ namespace AnnonsWebAPI.Controllers
                 Id = ad.Id,
                 Title = ad.Title,
                 Description = ad.Description,
-                TargetUrl= ad.TargetUrl,
+                TargetUrl = ad.TargetUrl,
                 StartDate = DateTime.Now
             };
 
@@ -117,6 +118,25 @@ namespace AnnonsWebAPI.Controllers
             await _dbContext.SaveChangesAsync();
 
             return Ok(updateAdDTO);
+        }
+        [HttpPatch]
+        [Route("{id}")]
+        [Authorize(Roles ="Admin")]
+        public async Task<ActionResult<UpdateAdDTO>> PatchAd(JsonPatchDocument ad, int id)
+        {
+            var adToUpdate = await
+                _dbContext.Ads.FindAsync(id);
+
+            if (adToUpdate == null)
+            {
+                return BadRequest("Ad not found");
+            }
+
+            ad.ApplyTo(adToUpdate);
+            await _dbContext.SaveChangesAsync();
+
+            return Ok(await _dbContext.Ads.ToListAsync());
+
         }
 
         [HttpDelete]

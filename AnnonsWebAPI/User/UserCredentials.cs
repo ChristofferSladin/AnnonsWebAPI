@@ -21,6 +21,24 @@
                 GivenName = "Richard",
                 SurName = "Chalk",
                 Role = "User",
+            },
+            new UserModel() // Full read/write access
+            {
+                UserName = "Christo_admin",
+                EmailAddress = "christo_admin@email.se",
+                Password = "passwordAdmin",
+                GivenName = "Christoffer",
+                SurName = "Sladin",
+                Role = "Admin",
+            },
+            new UserModel() // Can only Read
+            {
+                UserName = "Christo_user",
+                EmailAddress = "christo_user@email.se",
+                Password = "passwordUser",
+                GivenName = "Christoffer",
+                SurName = "Sladin",
+                Role = "User",
             }
         };
     }
