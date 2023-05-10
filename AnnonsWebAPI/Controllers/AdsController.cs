@@ -55,6 +55,19 @@ namespace AnnonsWebAPI.Controllers
             return Ok(adDTOs);
         }
 
+        // READ ONE ///////////////////////////////////////////////////////
+        /// <summary>
+        /// Retrieve ONE Ad from the database
+        /// </summary>
+        /// <returns>
+        /// One Ad
+        /// </returns>
+        /// <remarks>
+        /// Example end point: GET /api/Ads{id}
+        /// </remarks>
+        /// <response code="200">
+        /// Successfully returned ONE Ad
+        /// </response>
 
         [HttpGet]
         [Route("{id}")]
@@ -80,6 +93,20 @@ namespace AnnonsWebAPI.Controllers
             return Ok(adDTO);
         }
 
+        // CREATE AN AD ///////////////////////////////////////////////////////
+        /// <summary>
+        /// Create an Ad and save it in the database
+        /// </summary>
+        /// <returns>
+        /// A new create Ad
+        /// </returns>
+        /// <remarks>
+        /// Example end point: POST /api/Ads
+        /// </remarks>
+        /// <response code="200">
+        /// Successfully returned a created Ad
+        /// </response>
+
         [HttpPost]
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<AdDTO>> PostAd(UpdateAdDTO adDTO)
@@ -97,6 +124,20 @@ namespace AnnonsWebAPI.Controllers
 
             return Ok(adDTO);
         }
+
+        // UPDATE AN AD ///////////////////////////////////////////////////////
+        /// <summary>
+        /// Update an Ad and save the changes in the database
+        /// </summary>
+        /// <returns>
+        /// An updated Ad
+        /// </returns>
+        /// <remarks>
+        /// Example end point: PUT /api/Ads{id}
+        /// </remarks>
+        /// <response code="200">
+        /// Successfully returned an updated Ad
+        /// </response>
 
         [HttpPut]
         [Route("{id}")]
@@ -119,6 +160,21 @@ namespace AnnonsWebAPI.Controllers
 
             return Ok(updateAdDTO);
         }
+
+        // UPDATE A PARTIAL OF AN AD ///////////////////////////////////////////////////////
+        /// <summary>
+        /// Update a partial of an Ad and save the changes in the database
+        /// </summary>
+        /// <returns>
+        /// A partial of the updated Ad
+        /// </returns>
+        /// <remarks>
+        /// Example end point: PATCH /api/Ads{id}
+        /// </remarks>
+        /// <response code="200">
+        /// Successfully returned the partial of the updated Ad
+        /// </response>
+
         [HttpPatch]
         [Route("{id}")]
         [Authorize(Roles ="Admin")]
@@ -138,6 +194,20 @@ namespace AnnonsWebAPI.Controllers
             return Ok(await _dbContext.Ads.ToListAsync());
 
         }
+
+        // DELETE AN AD ///////////////////////////////////////////////////////
+        /// <summary>
+        /// Delete an Ad and remove it from the database
+        /// </summary>
+        /// <returns>
+        /// Deletes the AD
+        /// </returns>
+        /// <remarks>
+        /// Example end point: DELETE /api/Ads{id}
+        /// </remarks>
+        /// <response code="200">
+        /// Ad deleted successfully
+        /// </response>
 
         [HttpDelete]
         [Route("{id}")]
