@@ -72,6 +72,8 @@ builder.Services.AddSwaggerGen(sw =>
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+builder.Services.AddScoped<DataInitializer>();
+
 // JWT Token authorisation ======================================================
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
