@@ -14,7 +14,7 @@ namespace AnnonsWebAPI.Data
 
         public void MigrateData()
         {
-            _dbContext.Database.Migrate();
+            //_dbContext.Database.Migrate();
             SeedData();
             _dbContext.SaveChanges();
         }

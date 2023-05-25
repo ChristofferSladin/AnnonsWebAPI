@@ -177,7 +177,7 @@ namespace AnnonsWebAPI.Controllers
 
         [HttpPatch]
         [Route("{id}")]
-        [Authorize(Roles ="Admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<UpdateAdDTO>> PatchAd(JsonPatchDocument ad, int id)
         {
             var adToUpdate = await
